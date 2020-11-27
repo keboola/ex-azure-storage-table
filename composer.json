@@ -1,6 +1,6 @@
 {
-    "name": "keboola/my-component",
-    "description": "MyComponent description",
+    "name": "keboola/ex-azure-storage-table",
+    "description": "Azure Table storage / Azure Cosmos DB Table API extractor.",
     "license": "MIT",
     "require": {
         "php": "^7.4",
@@ -18,13 +18,13 @@
     },
     "autoload": {
         "psr-4": {
-            "MyComponent\\": "src/"
+            "Keboola\\AzureStorageTableExtractor\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "MyComponent\\Tests\\": "tests/phpunit/",
-            "MyComponent\\FunctionalTests\\": "tests/functional/"
+            "Keboola\\AzureStorageTableExtractor\\Tests\\": "tests/phpunit/",
+            "Keboola\\AzureStorageTableExtractor\\FunctionalTests\\": "tests/functional/"
         }
     },
     "scripts": {
