@@ -1,6 +1,6 @@
-# my-component
+# ex-azure-storage-table
 
-[![Build Status](https://travis-ci.com/keboola/my-component.svg?branch=master)](https://travis-ci.com/keboola/my-component)
+[![Build Status](https://travis-ci.com/keboola/ex-azure-storage-table.svg?branch=master)](https://travis-ci.com/keboola/ex-azure-storage-table)
 
 > Fill in description
 
@@ -13,8 +13,8 @@
 Clone this repository and init the workspace with following command:
 
 ```
-git clone https://github.com/keboola/my-component
-cd my-component
+git clone https://github.com/keboola/ex-azure-storage-table
+cd ex-azure-storage-table
 docker-compose build
 docker-compose run --rm dev composer install --no-scripts
 ```
