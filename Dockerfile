@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
         locales \
         unzip \
+        libcurl4-openssl-dev \
+        libxml2-dev \
+        libxslt-dev \
 	&& rm -r /var/lib/apt/lists/* \
 	&& sed -i 's/^# *\(en_US.UTF-8\)/\1/' /etc/locale.gen \
 	&& locale-gen \
@@ -23,6 +26,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV LANGUAGE=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
+
+# Install curl extension
+RUN docker-php-ext-install curl
+
+# Install xsl extension
+RUN docker-php-ext-install xsl
 
 ## Composer - deps always cached unless changed
 # First copy only composer files
