@@ -22,7 +22,8 @@ class Component extends BaseComponent
         parent::__construct($logger);
         $config = $this->getConfig();
         $clientFactory = new TableClientFactory($config);
-        $this->extractor = new Extractor($config, $clientFactory);
+        $queryFactory = new QueryFactory($config);
+        $this->extractor = new Extractor($config, $this->getLogger(), $clientFactory, $queryFactory);
     }
 
     protected function getSyncActions(): array
