@@ -2,6 +2,8 @@ version: '3'
 services:
   dev:
     build: .
+    environment:
+      - CONNECTION_STRING
     volumes:
       - ./:/code
       - ./data:/data
