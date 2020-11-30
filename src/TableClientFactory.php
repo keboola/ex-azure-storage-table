@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor;
 
-use Keboola\Component\UserException;
+use Keboola\AzureStorageTableExtractor\Exception\UserException;
 use RuntimeException;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use MicrosoftAzure\Storage\Table\Internal\ITable;
@@ -24,7 +24,7 @@ class TableClientFactory
         try {
             return TableRestProxy::createTableService($this->config->getConnectionString());
         } catch (RuntimeException $e) {
-            throw new UserException('Connection error: ' . $e->getMessage(), $e->getCode(), $e);
+            throw UserException::from($e, $this->config->getConnectionString(), 'Connection error: ');
         }
     }
 }

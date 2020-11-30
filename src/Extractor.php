@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor;
 
-use Keboola\Component\UserException;
+use Keboola\AzureStorageTableExtractor\Configuration\Config;
+use Keboola\AzureStorageTableExtractor\Exception\UserException;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use MicrosoftAzure\Storage\Table\Internal\ITable;
 
 class Extractor
 {
+    private Config $config;
+
     private ITable $tableClient;
 
-    public function __construct(TableClientFactory $clientFactory)
+    public function __construct(Config $config, TableClientFactory $clientFactory)
     {
+        $this->config = $config;
         $this->tableClient = $clientFactory->create();
     }
 
@@ -22,7 +26,7 @@ class Extractor
         try {
             $this->tableClient->queryTables();
         } catch (ServiceException $e) {
-            throw new UserException($e->getMessage(), $e->getCode(), $e);
+            throw UserException::from($e, $this->config->getConnectionString());
         }
     }
 
