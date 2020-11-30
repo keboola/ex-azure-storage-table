@@ -5,16 +5,18 @@
     "require": {
         "php": "^7.4",
         "keboola/common-exceptions": "^1.1",
+        "keboola/csv": "^2.2",
         "keboola/php-component": "^8.1",
         "microsoft/azure-storage-table": "^1.1"
     },
     "require-dev": {
-        "php-parallel-lint/php-parallel-lint": "^1.2",
         "keboola/coding-standard": ">=7.0.2",
         "keboola/datadir-tests": "^5.2",
         "keboola/php-temp": "^2.0",
+        "php-parallel-lint/php-parallel-lint": "^1.2",
         "phpstan/phpstan": "^0.12.14",
         "phpunit/phpunit": "^9.0",
+        "symfony/finder": "^5.2",
         "symfony/process": "^5.0"
     },
     "autoload": {

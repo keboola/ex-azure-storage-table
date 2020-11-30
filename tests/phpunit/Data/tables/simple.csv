@@ -1,0 +1,6 @@
+"PartitionKey","RowKey","name","age"
+"","","Edm.String","Edm.Int32"
+"Europe","1","John","14"
+"Europe","2","Jacob","25"
+"Europe","3","Elizabeth","17"
+"Europe","4","Michael","27"

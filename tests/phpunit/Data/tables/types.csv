@@ -1,0 +1,7 @@
+"PartitionKey","RowKey","name","age","height","credits","has_pet","date","bin"
+"","","Edm.String","Edm.Int32","Edm.Int64","Edm.Double","Edm.Boolean","Edm.DateTime","Edm.Binary"
+"Europe","1","John","14","150","1.23","1","2020-01-17T16:07:34","bin_blob1"
+"Europe","3","Jacob","25","182","0.45","0","2020-04-15T14:47:38","bin_blob2"
+"Europe","2","Elizabeth","17","169","18.93","1","2020-08-09T15:47:15","bin_blob3"
+"Europe","4","Michael","27","173","14.2","1","2020-07-17T07:03:57","bin_blob4"
+"Europe","5","Oliver","37","175","11.89","0","2020-04-01T08:22:49","bin_blob5"

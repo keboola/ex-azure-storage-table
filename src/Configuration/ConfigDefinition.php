@@ -10,6 +10,8 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class ConfigDefinition extends BaseConfigDefinition
 {
+    public const DEFAULT_MAX_TRIES = 5;
+
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
         $parametersNode = parent::getParametersDefinition();
@@ -19,7 +21,16 @@ class ConfigDefinition extends BaseConfigDefinition
         $parametersNode
             ->ignoreExtraKeys(true)
             ->children()
-            ->append(new DbNode());
+                ->append(new DbNode())
+                ->scalarNode('table')->isRequired()->cannotBeEmpty()->end()
+                ->scalarNode('output')->isRequired()->cannotBeEmpty()->end()
+                ->integerNode('maxTries')->min(1)->defaultValue(self::DEFAULT_MAX_TRIES)->end()
+                // Custom query
+                ->scalarNode('query')->defaultNull()->cannotBeEmpty()->end()
+                  // Incremental loading
+                ->booleanNode('incremental')->defaultValue(false)->end()
+                // Incremental fetching
+                ->scalarNode('incrementalFetchingColumn')->defaultNull()->end();
         // @formatter:on
         return $parametersNode;
     }
