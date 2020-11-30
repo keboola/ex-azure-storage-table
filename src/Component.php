@@ -4,13 +4,50 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor;
 
+use Keboola\AzureStorageTableExtractor\Configuration\ActionConfigDefinition;
+use Keboola\AzureStorageTableExtractor\Configuration\Config;
+use Keboola\AzureStorageTableExtractor\Configuration\ConfigDefinition;
 use Keboola\Component\BaseComponent;
+use Psr\Log\LoggerInterface;
 
 class Component extends BaseComponent
 {
+    public const ACTION_RUN = 'run';
+    public const ACTION_TEST_CONNECTION = 'testConnection';
+
+    private Extractor $extractor;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        parent::__construct($logger);
+        $config = $this->getConfig();
+        $clientFactory = new TableClientFactory($config);
+        $this->extractor = new Extractor($clientFactory);
+    }
+
+    protected function getSyncActions(): array
+    {
+        return [
+            self::ACTION_TEST_CONNECTION => 'handleTestConnection',
+        ];
+    }
+
     protected function run(): void
     {
-        // @TODO implement
+        $this->extractor->extract();
+    }
+
+    protected function handleTestConnection(): array
+    {
+        $this->extractor->testConnection();
+        return ['success' => true];
+    }
+
+    public function getConfig(): Config
+    {
+        /** @var Config $config */
+        $config = parent::getConfig();
+        return $config;
     }
 
     protected function getConfigClass(): string
@@ -20,6 +57,7 @@ class Component extends BaseComponent
 
     protected function getConfigDefinitionClass(): string
     {
-        return ConfigDefinition::class;
+        $action = $this->getRawConfig()['action'] ?? 'run';
+        return $action === 'run' ? ConfigDefinition::class : ActionConfigDefinition::class;
     }
 }

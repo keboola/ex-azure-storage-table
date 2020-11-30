@@ -1,0 +1,8 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "#connectionString": "DefaultEndpointsProtocol=https;AccountName=ex-cosmosdb-table-api-dev-ci;AccountKey=INVALID;TableEndpoint=https://ex-cosmosdb-table-api-dev-ci.table.cosmos.azure.com:443/;"
+    }
+  }
+}

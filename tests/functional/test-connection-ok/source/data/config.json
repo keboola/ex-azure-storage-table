@@ -1,0 +1,8 @@
+{
+  "action": "testConnection",
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    }
+  }
+}
