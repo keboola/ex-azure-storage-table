@@ -3,5 +3,7 @@ parameters:
     ignoreErrors:
         - '#Cannot call method .*\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null.#'
         - '#Unsafe usage of new static\(\).#'
+        - '#Access to an undefined property object::\$PartitionKey.#'
+        - '#Access to an undefined property object::\$RowKey.#'
         # Ignore errors from JsonDeserializer not implemented methods
         - '#Keboola\\AzureStorageTableExtractor\\JsonDeserializer#'

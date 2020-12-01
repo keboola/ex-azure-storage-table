@@ -6,16 +6,18 @@ namespace Keboola\AzureStorageTableExtractor;
 
 use GuzzleHttp\Promise\Promise;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
+use Keboola\AzureStorageTableExtractor\CsvWriter\CsvWriterFactory;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use MicrosoftAzure\Storage\Table\Internal\ITable;
 use MicrosoftAzure\Storage\Table\Models\QueryEntitiesOptions;
-use MicrosoftAzure\Storage\Table\Models\QueryEntitiesResult;
 use Psr\Log\LoggerInterface;
 
 class Extractor
 {
     public const ACCEPT_HEADER = 'application/json;odata=nometadata';
+
+    public const PROGRESS_LOG_INTERVAL_SEC = 30;
 
     private Config $config;
 
@@ -25,18 +27,30 @@ class Extractor
 
     private QueryFactory $queryFactory;
 
+    private CsvWriterFactory $csvWriterFactory;
+
+    private array $inputState;
+
     private int $pageCount = 0;
+
+    private int $rowsCount = 0;
+
+    private ?float $lastProgressLog = null;
 
     public function __construct(
         Config $config,
         LoggerInterface $logger,
-        TableClientFactory $clientFactory,
-        QueryFactory $queryFactory
+        ITable $tableClient,
+        QueryFactory $queryFactory,
+        CsvWriterFactory $csvWriterFactory,
+        array $inputState
     ) {
         $this->config = $config;
         $this->logger = $logger;
-        $this->tableClient = $clientFactory->create();
+        $this->tableClient = $tableClient;
         $this->queryFactory = $queryFactory;
+        $this->csvWriterFactory = $csvWriterFactory;
+        $this->inputState = $inputState;
     }
 
     public function testConnection(): void
@@ -50,9 +64,12 @@ class Extractor
 
     public function extract(): void
     {
+        $csvWriter = $this->csvWriterFactory->create();
+
         $query = $this->queryFactory->create();
         $options = new QueryEntitiesOptions();
         $options->setQuery($query);
+        $options->setDecodeContent(false);
         $options->setAccept(Extractor::ACCEPT_HEADER);
 
         $this->logger->info(sprintf(
@@ -64,36 +81,69 @@ class Extractor
         /** @var Promise|null $prevPagePromise */
         $prevPagePromise = null;
         while (true) {
-            // Start loading of the the new page
-            $newPagePromise = $this->tableClient->queryEntitiesAsync($this->config->getTable(), $options);
+            // Wait for the previous page
+            $result = $prevPagePromise ? $prevPagePromise->wait() : null;
 
-            // Process the previous page, while waiting for the next page ^^^^
-            if ($prevPagePromise) {
-                $result = $prevPagePromise->wait();
-                $this->writeResultPage($result);
-
-                if ($result->getContinuationToken()) {
-                    $options->setContinuationToken($result->getContinuationToken());
-                } else {
-                    // no more page
-                    break;
-                }
-
-                $this->pageCount++;
+            // Set continuation token if present
+            if ($result && $result->getContinuationToken()) {
+                $options->setContinuationToken($result->getContinuationToken());
             }
 
+            // Start loading of the the new page, if it is first page, or continuation token is present
+            $newPagePromise = !$result || $result->getContinuationToken() ?
+                $this->tableClient->queryEntitiesAsync($this->config->getTable(), $options) : null;
+
+            // Process the previous page, while waiting for the next page ^^^^
+            if ($result) {
+                foreach ($result->getEntities() as &$entity) {
+                    $csvWriter->writeItem($entity);
+                    $this->rowsCount++;
+                }
+                $this->pageCount++;
+                $this->logProgress();
+            }
+
+            // No more pages?
+            if (!$newPagePromise) {
+                break;
+            }
             $prevPagePromise = $newPagePromise;
         }
 
-        $this->finalize();
+        $this->logFinalStats();
+
+        // All items wrote, finalize
+        $csvWriter->finalize();
+
+        // Write last state incremental fetching
+        if ($this->config->hasIncrementalFetchingKey()) {
+            $csvWriter->writeLastState($this->inputState);
+        }
     }
 
-    private function writeResultPage(QueryEntitiesResult $result): void
+    private function logProgress(): void
     {
-        //var_dump($result->getEntities());
+        if (microtime(true) - $this->lastProgressLog < self::PROGRESS_LOG_INTERVAL_SEC) {
+            return;
+        }
+
+        if ($this->lastProgressLog) {
+            $this->logger->info(sprintf(
+                'Progress: "%s" rows / "%s" pages exported.',
+                $this->rowsCount,
+                $this->pageCount
+            ));
+        }
+
+        $this->lastProgressLog = microtime(true);
     }
 
-    private function finalize(): void
+    private function logFinalStats(): void
     {
+        $this->logger->info(sprintf(
+            'Exported all "%s" rows / "%s" pages.',
+            $this->rowsCount,
+            $this->pageCount
+        ));
     }
 }

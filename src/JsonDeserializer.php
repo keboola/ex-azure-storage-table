@@ -31,9 +31,12 @@ class JsonDeserializer implements IODataReaderWriter
     }
 
     /** @inheritDoc */
-    public function parseTableEntries($body): void
+    public function parseTableEntries($body): array
     {
-        throw new RuntimeException('Not implemented.');
+        // We use "queryTables" to test connection
+        // ... but we don't need to parse response.
+        // See Extractor class
+        return ['not-implemented'];
     }
 
     /** @inheritDoc */
@@ -55,7 +58,7 @@ class JsonDeserializer implements IODataReaderWriter
         /** @var Stream $stream */
         $stream = $body;
         $stream->rewind();
-        $bodyArray = JsonHelper::decode($stream->getContents());
-        return $bodyArray[Resources::JSON_VALUE];
+        $bodyArray = json_decode($stream->getContents(), false, 512, JSON_THROW_ON_ERROR);
+        return $bodyArray->{Resources::JSON_VALUE};
     }
 }
