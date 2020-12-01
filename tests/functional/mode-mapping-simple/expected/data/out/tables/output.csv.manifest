@@ -1,0 +1,10 @@
+{
+    "primary_key": [],
+    "columns": [
+        "id",
+        "name",
+        "age",
+        "missing"
+    ],
+    "incremental": false
+}
