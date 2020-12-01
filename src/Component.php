@@ -24,10 +24,11 @@ class Component extends BaseComponent
         $config = $this->getConfig();
         $logger = $this->getLogger();
         $dataDir = $this->getDataDir();
+        $manifestManager = $this->getManifestManager();
         $incFetchingHelper = new IncrementalFetchingHelper($config, $dataDir, $this->getInputState());
         $clientFactory = new TableClientFactory($config, $logger);
         $queryFactory = new QueryFactory($config, $incFetchingHelper);
-        $csvWriterFactory = new CsvWriterFactory($dataDir, $config, $incFetchingHelper);
+        $csvWriterFactory = new CsvWriterFactory($dataDir, $manifestManager, $config, $incFetchingHelper);
         $this->extractor = new Extractor(
             $config,
             $logger,

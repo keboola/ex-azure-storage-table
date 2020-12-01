@@ -6,10 +6,13 @@ namespace Keboola\AzureStorageTableExtractor\CsvWriter;
 
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use Keboola\AzureStorageTableExtractor\IncrementalFetchingHelper;
+use Keboola\Component\Manifest\ManifestManager;
 
 abstract class BaseCsvWriter implements ICsvWriter
 {
     protected string $dataDir;
+
+    protected ManifestManager $manifestManager;
 
     protected Config $config;
 
@@ -17,12 +20,20 @@ abstract class BaseCsvWriter implements ICsvWriter
 
     protected int $rowCount = 0;
 
-    public function __construct(string $dataDir, Config $config, IncrementalFetchingHelper $incFetchingHelper)
-    {
+    public function __construct(
+        string $dataDir,
+        ManifestManager $manifestManager,
+        Config $config,
+        IncrementalFetchingHelper $incFetchingHelper
+    ) {
         $this->dataDir = $dataDir;
+        $this->manifestManager = $manifestManager;
         $this->config = $config;
         $this->incFetchingHelper = $incFetchingHelper;
+        $this->init();
     }
+
+    abstract protected function init(): void;
 
     public function writeItem(object $item): void
     {

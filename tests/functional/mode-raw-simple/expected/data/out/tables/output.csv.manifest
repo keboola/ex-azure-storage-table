@@ -1,12 +1,12 @@
 {
+    "primary_key": [
+        "PartitionKey",
+        "RowKey"
+    ],
     "columns": [
         "PartitionKey",
         "RowKey",
         "data"
-    ],
-    "primary_key": [
-        "PartitionKey",
-        "RowKey"
     ],
     "incremental": false
 }

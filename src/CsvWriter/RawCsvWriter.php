@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor\CsvWriter;
 
-use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use Keboola\AzureStorageTableExtractor\Exception\ApplicationException;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
-use Keboola\AzureStorageTableExtractor\IncrementalFetchingHelper;
-use Keboola\Component\JsonHelper;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 use Keboola\Csv\CsvWriter;
 
 class RawCsvWriter extends BaseCsvWriter implements ICsvWriter
@@ -23,10 +21,9 @@ class RawCsvWriter extends BaseCsvWriter implements ICsvWriter
 
     private CsvWriter $writer;
 
-    public function __construct(string $dataDir, Config $config, IncrementalFetchingHelper $incFetchingHelper)
+    public function init(): void
     {
-        parent::__construct($dataDir, $config, $incFetchingHelper);
-        $this->csvPath = sprintf('%s/out/tables/%s.csv', $dataDir, $config->getOutput());
+        $this->csvPath = sprintf('%s/out/tables/%s.csv', $this->dataDir, $this->config->getOutput());
         $this->writer = new CsvWriter($this->csvPath);
     }
 
@@ -58,21 +55,20 @@ class RawCsvWriter extends BaseCsvWriter implements ICsvWriter
         $this->writeManifest();
     }
 
-    public function writeManifest(): void
+    protected function writeManifest(): void
     {
         if ($this->rowCount > 0) {
-            $manifestPath = $this->csvPath . '.manifest';
-            file_put_contents($manifestPath, JsonHelper::encode($this->getManifest(), true));
+            $this->manifestManager->writeTableManifest(basename($this->csvPath), $this->getManifest());
         }
     }
 
-    protected function getManifest(): array
+    protected function getManifest(): OutTableManifestOptions
     {
-        return [
-            'columns' => [self::PARTITION_KEY_COLUMN, self::ROW_KEY_COLUMN, self::DATA_COLUMN],
-            'primary_key' => [self::PARTITION_KEY_COLUMN, self::ROW_KEY_COLUMN],
-            'incremental' => $this->config->isIncremental(),
-        ];
+        $options = new OutTableManifestOptions();
+        $options->setColumns([self::PARTITION_KEY_COLUMN, self::ROW_KEY_COLUMN, self::DATA_COLUMN]);
+        $options->setPrimaryKeyColumns([self::PARTITION_KEY_COLUMN, self::ROW_KEY_COLUMN]);
+        $options->setIncremental($this->config->isIncremental());
+        return $options;
     }
 
     protected function getPrimaryKey(object $item): array
