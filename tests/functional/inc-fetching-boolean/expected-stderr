@@ -1,0 +1,1 @@
+Unexpected type "Edm.Boolean" of the incremental fetching "boolean" key. Allowed types "Edm.String", "Edm.Int32", "Edm.Int64", "Edm.DateTime", "Edm.Double", "Edm.Guid".

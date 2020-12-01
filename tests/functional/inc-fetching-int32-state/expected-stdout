@@ -1,0 +1,4 @@
+Exporting table "inc-fetching" to "output" ...
+Incremental fetching: loading rows where "int32" >= "4000" (Edm.Int32)
+Exported "2" rows / "1" pages.
+Incremental fetching: new state "int32" = "50000" (Edm.Int32)

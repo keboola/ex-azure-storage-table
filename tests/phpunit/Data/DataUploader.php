@@ -121,7 +121,11 @@ class DataUploader
                 [$type, $value] = $this->explodeTypeAndValue($cell);
                 // Convert datetime
                 if ($type === EdmType::DATETIME) {
-                    $value = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $value);
+                    $date = $value;
+                    $value = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $date);
+                    if(!$value) {
+                        throw new RuntimeException(sprintf('Invalid date: "%s".', $date));
+                    }
                 } elseif ($type === EdmType::BOOLEAN) {
                     $value = $value === '1';
                 }
@@ -159,3 +163,4 @@ class DataUploader
         return explode(':', $cell, 2);
     }
 }
+

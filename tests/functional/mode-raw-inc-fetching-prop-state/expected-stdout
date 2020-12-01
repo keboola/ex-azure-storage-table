@@ -1,4 +1,0 @@
-Exporting table "types" to "output" ...
-Incremental fetching: loading rows where "height" >= "173" (Edm.Int64)
-Exported "3" rows / "1" pages.
-Incremental fetching: new state "height" = "182" (Edm.Int64)

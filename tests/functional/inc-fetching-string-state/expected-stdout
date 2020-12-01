@@ -1,0 +1,4 @@
+Exporting table "inc-fetching" to "output" ...
+Incremental fetching: loading rows where "string" >= "00300" (Edm.String)
+Exported "3" rows / "1" pages.
+Incremental fetching: new state "string" = "50000" (Edm.String)

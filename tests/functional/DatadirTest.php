@@ -18,13 +18,13 @@ class DatadirTest extends DatadirTestCase
         Process $runProcess,
         string $tempDatadir
     ): void {
-        // Remove timestamps from output.csv files
+        // Remove timestamps from output.csv files (in raw mode)
         $finder = new Finder();
         foreach ($finder->files()->in($tempDatadir . '/out/tables')->name('*.csv') as $file) {
             $content = (string) file_get_contents($file->getPathname());
             $content = (string) preg_replace(
-                '~\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z~',
-                '***',
+                '~""\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d+Z""~',
+                '""***""',
                 $content
             );
             file_put_contents($file->getPathname(), $content);
