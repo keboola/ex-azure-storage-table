@@ -9,6 +9,7 @@ use Keboola\AzureStorageTableExtractor\Exception\UndefinedValueException;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
 use Keboola\Component\JsonHelper;
 use MicrosoftAzure\Storage\Table\Models\EdmType;
+use Psr\Log\LoggerInterface;
 
 class IncrementalFetchingHelper
 {
@@ -16,6 +17,8 @@ class IncrementalFetchingHelper
     public const STATE_INCREMENTAL_VALUE_TYPE = 'maxIncrementalValueType';
 
     private Config $config;
+
+    private LoggerInterface $logger;
 
     private string $dataDir;
 
@@ -32,9 +35,10 @@ class IncrementalFetchingHelper
     protected ?string $key;
 
 
-    public function __construct(Config $config, string $dataDir, array $inputState)
+    public function __construct(Config $config, LoggerInterface $logger, string $dataDir, array $inputState)
     {
         $this->config = $config;
+        $this->logger = $logger;
         $this->dataDir = $dataDir;
         $this->inputState = $inputState;
         $this->enabled = $config->hasIncrementalFetchingKey();
@@ -119,6 +123,12 @@ class IncrementalFetchingHelper
                     self::STATE_INCREMENTAL_VALUE_TYPE => $this->valueType,
                 ]
             );
+            $this->logger->info(sprintf(
+                'Incremental fetching: new state "%s" = "%s" (%s)',
+                $this->key,
+                $this->maxValue,
+                $this->valueType
+            ));
         }
     }
 }

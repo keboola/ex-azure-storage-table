@@ -67,17 +67,17 @@ class Extractor
         $csvWriter = $this->csvWriterFactory->create();
         $limit = $this->config->hasLimit() ? $this->config->getLimit() : null;
 
-        $query = $this->queryFactory->create();
-        $options = new QueryEntitiesOptions();
-        $options->setQuery($query);
-        $options->setDecodeContent(false);
-        $options->setAccept(Extractor::ACCEPT_HEADER);
-
         $this->logger->info(sprintf(
             'Exporting table "%s" to "%s" ...',
             $this->config->getTable(),
             $this->config->getOutput()
         ));
+
+        $query = $this->queryFactory->create();
+        $options = new QueryEntitiesOptions();
+        $options->setQuery($query);
+        $options->setDecodeContent(false);
+        $options->setAccept(Extractor::ACCEPT_HEADER);
 
         /** @var Promise|null $prevPagePromise */
         $prevPagePromise = null;
@@ -147,7 +147,7 @@ class Extractor
     private function logFinalStats(): void
     {
         $this->logger->info(sprintf(
-            'Exported all "%s" rows / "%s" pages.',
+            'Exported "%s" rows / "%s" pages.',
             $this->rowsCount,
             $this->pageCount
         ));

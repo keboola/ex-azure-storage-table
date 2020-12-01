@@ -7,16 +7,20 @@ namespace Keboola\AzureStorageTableExtractor;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use MicrosoftAzure\Storage\Table\Models\Filters\Filter;
 use MicrosoftAzure\Storage\Table\Models\Query;
+use Psr\Log\LoggerInterface;
 
 class QueryFactory
 {
     private Config $config;
 
+    private LoggerInterface $logger;
+
     private IncrementalFetchingHelper $incFetchingHelper;
 
-    public function __construct(Config $config, IncrementalFetchingHelper $incFetchingHelper)
+    public function __construct(Config $config, LoggerInterface $logger, IncrementalFetchingHelper $incFetchingHelper)
     {
         $this->config = $config;
+        $this->logger = $logger;
         $this->incFetchingHelper = $incFetchingHelper;
     }
 
@@ -34,6 +38,12 @@ class QueryFactory
                 )
             );
             $query->setFilter($filter);
+            $this->logger->info(sprintf(
+                'Incremental fetching: loading rows where "%s" >= "%s" (%s)',
+                $this->incFetchingHelper->getKey(),
+                $this->incFetchingHelper->getValue(),
+                $this->incFetchingHelper->getValueType()
+            ));
         } elseif ($this->config->hasFilter()) {
             $query->setFilter(Filter::applyQueryString($this->config->getFilter()));
         }
