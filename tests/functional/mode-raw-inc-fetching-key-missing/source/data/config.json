@@ -1,0 +1,12 @@
+{
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    },
+    "table": "types",
+    "output": "output",
+    "mode": "raw",
+    "incremental": true,
+    "incrementalFetchingKey": "missing"
+  }
+}
