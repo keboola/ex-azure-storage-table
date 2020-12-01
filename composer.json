@@ -4,8 +4,10 @@
     "license": "MIT",
     "require": {
         "php": "^7.4",
+        "ext-json": "*",
         "keboola/common-exceptions": "^1.1",
         "keboola/csv": "^2.2",
+        "keboola/csvmap": "^1.1",
         "keboola/php-component": "^8.1",
         "microsoft/azure-storage-table": "^1.1"
     },

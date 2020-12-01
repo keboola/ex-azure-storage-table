@@ -3,7 +3,8 @@
     "db": {
       "#connectionString": "%env(string:CONNECTION_STRING)%"
     },
-    "table": "big-table",
-    "output": "output"
+    "table": "simple",
+    "output": "output",
+    "mode": "raw"
   }
 }

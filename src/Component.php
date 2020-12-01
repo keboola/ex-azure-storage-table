@@ -7,6 +7,7 @@ namespace Keboola\AzureStorageTableExtractor;
 use Keboola\AzureStorageTableExtractor\Configuration\ActionConfigDefinition;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use Keboola\AzureStorageTableExtractor\Configuration\ConfigDefinition;
+use Keboola\AzureStorageTableExtractor\CsvWriter\CsvWriterFactory;
 use Keboola\Component\BaseComponent;
 use Psr\Log\LoggerInterface;
 
@@ -23,7 +24,15 @@ class Component extends BaseComponent
         $config = $this->getConfig();
         $clientFactory = new TableClientFactory($config);
         $queryFactory = new QueryFactory($config);
-        $this->extractor = new Extractor($config, $this->getLogger(), $clientFactory, $queryFactory);
+        $csvWriterFactory = new CsvWriterFactory($this->getDataDir(), $config);
+        $this->extractor = new Extractor(
+            $config,
+            $this->getLogger(),
+            $clientFactory->create(),
+            $queryFactory,
+            $csvWriterFactory,
+            $this->getInputState()
+        );
     }
 
     protected function getSyncActions(): array
