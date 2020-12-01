@@ -1,0 +1,4 @@
+"Europe","1","{""name"":""John"",""age"":14,""PartitionKey"":""Europe"",""RowKey"":""1""}"
+"Europe","2","{""name"":""Jacob"",""age"":25,""PartitionKey"":""Europe"",""RowKey"":""2""}"
+"Europe","3","{""name"":""Elizabeth"",""age"":17,""PartitionKey"":""Europe"",""RowKey"":""3""}"
+"Europe","4","{""name"":""Michael"",""age"":27,""PartitionKey"":""Europe"",""RowKey"":""4""}"

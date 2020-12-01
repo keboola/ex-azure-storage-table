@@ -65,6 +65,7 @@ class Extractor
     public function extract(): void
     {
         $csvWriter = $this->csvWriterFactory->create();
+        $limit = $this->config->hasLimit() ? $this->config->getLimit() : null;
 
         $query = $this->queryFactory->create();
         $options = new QueryEntitiesOptions();
@@ -95,11 +96,18 @@ class Extractor
 
             // Process the previous page, while waiting for the next page ^^^^
             if ($result) {
+                $this->pageCount++;
                 foreach ($result->getEntities() as &$entity) {
                     $csvWriter->writeItem($entity);
                     $this->rowsCount++;
+
+                    // In the QueryFactory is "$top" set to the limit from the config
+                    // But "$top" is limit for one request/page, therefore we must check limit in the code
+                    if ($limit && $this->rowsCount >= $limit) {
+                        break 2;
+                    }
                 }
-                $this->pageCount++;
+
                 $this->logProgress();
             }
 

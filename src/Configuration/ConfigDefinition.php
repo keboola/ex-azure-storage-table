@@ -16,8 +16,7 @@ class ConfigDefinition extends BaseConfigDefinition
     public const MODE_RAW = 'raw';
     public const MODE_MAPPING = 'mapping';
 
-    private const QUERY_INCOMPATIBLE_NODES = ['select', 'limit', 'incrementalFetchingKey'];
-    private const INCREMENTAL_FETCHING_INCOMPATIBLE_NODES = ['select'];
+    private const INCREMENTAL_FETCHING_INCOMPATIBLE_NODES = ['select', 'filter', 'limit'];
 
     protected function getParametersDefinition(): ArrayNodeDefinition
     {
@@ -33,10 +32,9 @@ class ConfigDefinition extends BaseConfigDefinition
                 ->scalarNode('output')->isRequired()->cannotBeEmpty()->end()
                 ->integerNode('maxTries')->min(1)->defaultValue(self::DEFAULT_MAX_TRIES)->end()
                 // Generated query
+                ->scalarNode('filter')->defaultNull()->cannotBeEmpty()->end()
                 ->scalarNode('select')->defaultNull()->cannotBeEmpty()->end()
                 ->integerNode('limit')->defaultNull()->end()
-                // Custom query
-                ->scalarNode('query')->defaultNull()->cannotBeEmpty()->end()
                 // Mapping
                 ->enumNode('mode')
                     ->values([self::MODE_MAPPING, self::MODE_RAW])
@@ -51,16 +49,6 @@ class ConfigDefinition extends BaseConfigDefinition
 
         // Validation
         $parametersNode->validate()->always(function ($v) {
-            // Custom or generated query can be used, not both.
-            foreach (self::QUERY_INCOMPATIBLE_NODES as $node) {
-                if (isset($v['query']) && isset($v[$node])) {
-                    throw new InvalidConfigurationException(sprintf(
-                        'Invalid configuration, "query" cannot be configured together with "%s".',
-                        $node
-                    ));
-                }
-            }
-
             // incrementalFetchingKey can not be used with select/sort.
             foreach (self::INCREMENTAL_FETCHING_INCOMPATIBLE_NODES as $node) {
                 if (isset($v['incrementalFetchingKey']) && isset($v[$node])) {

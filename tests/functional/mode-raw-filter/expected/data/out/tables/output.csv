@@ -1,0 +1,2 @@
+"Europe","2","{""PartitionKey"":""Europe"",""RowKey"":""2"",""name"":""Jacob"",""age"":25,""Timestamp"":""***""}"
+"Europe","4","{""PartitionKey"":""Europe"",""RowKey"":""4"",""name"":""Michael"",""age"":27,""Timestamp"":""***""}"

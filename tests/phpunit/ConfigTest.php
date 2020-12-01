@@ -47,7 +47,7 @@ class ConfigTest extends TestCase
                 'maxTries' => 5,
                 'select' => null,
                 'limit' => null,
-                'query' => null,
+                'filter' => null,
                 'mode' => 'raw',
                 'mapping' => null,
                 'isIncremental' => false,
@@ -55,14 +55,37 @@ class ConfigTest extends TestCase
             ],
         ];
 
-        yield 'generated-query' => [
+        yield 'filter-and-select' => [
+            [
+                'db' => $this->getDbNode(),
+                'table' => 'input-table',
+                'output' => 'output-csv',
+                'mode' => 'raw',
+                'filter' => "RowKey ge '2' and age gt 17",
+                'select' => 'name, data',
+            ],
+            [
+                'connectionString' => 'DefaultEndpointsProtocol=https;...',
+                'table' => 'input-table',
+                'output' => 'output-csv',
+                'maxTries' => 5,
+                'select' => ['name', 'data'],
+                'limit' => null,
+                'filter' => "RowKey ge '2' and age gt 17",
+                'mode' => 'raw',
+                'mapping' => null,
+                'isIncremental' => false,
+                'incrementalFetchingKey' => null,
+            ],
+        ];
+
+        yield 'limit-and-select' => [
             [
                 'db' => $this->getDbNode(),
                 'table' => 'input-table',
                 'output' => 'output-csv',
                 'maxTries' => 3,
-                'select' => 'x.name, x.data',
-                'sort' => 'x.date',
+                'select' => 'name, data',
                 'limit' => 500,
                 'mode' => 'raw',
                 'incremental' => true,
@@ -72,9 +95,9 @@ class ConfigTest extends TestCase
                 'table' => 'input-table',
                 'output' => 'output-csv',
                 'maxTries' => 3,
-                'select' => 'x.name, x.data',
+                'select' => ['name', 'data'],
                 'limit' => 500,
-                'query' => null,
+                'filter' => null,
                 'mode' => 'raw',
                 'mapping' => null,
                 'isIncremental' => true,
@@ -82,12 +105,12 @@ class ConfigTest extends TestCase
             ],
         ];
 
-        yield 'custom-query' => [
+        yield 'custom-filter' => [
             [
                 'db' => $this->getDbNode(),
                 'table' => 'input-table',
                 'output' => 'output-csv',
-                'query' => 'SELECT name, data FROM c',
+                'filter' => "RowKey ge '2' and age gt 17",
                 'mode' => 'raw',
             ],
             [
@@ -97,7 +120,7 @@ class ConfigTest extends TestCase
                 'maxTries' => 5,
                 'select' => null,
                 'limit' => null,
-                'query' => 'SELECT name, data FROM c',
+                'filter' => "RowKey ge '2' and age gt 17",
                 'mode' => 'raw',
                 'mapping' => null,
                 'isIncremental' => false,
@@ -128,7 +151,7 @@ class ConfigTest extends TestCase
                 'maxTries' => 5,
                 'select' => null,
                 'limit' => null,
-                'query' => null,
+                'filter' => null,
                 'mode' => 'mapping',
                 'mapping' => [
                     'id' => [
@@ -173,15 +196,15 @@ class ConfigTest extends TestCase
             ],
         ];
 
-        yield 'query-and-select' => [
-            'Invalid configuration, "query" cannot be configured together with "select".',
+        yield 'limit-and-incremental-fetching' => [
+            'Invalid configuration, "incrementalFetchingKey" cannot be configured together with "limit".',
             [
                 'db' => $this->getDbNode(),
                 'table' => 'input-table',
                 'output' => 'output-csv',
                 'mode' => 'raw',
-                'query' => 'SELECT name, data FROM c',
-                'select' => 'name, data',
+                'limit' => 100,
+                'incrementalFetchingKey' => 'date',
             ],
         ];
     }
@@ -195,7 +218,7 @@ class ConfigTest extends TestCase
             'maxTries' => $config->getMaxTries(),
             'select' => $config->hasSelect() ? $config->getSelect() : null,
             'limit' => $config->hasLimit() ? $config->getLimit() : null,
-            'query' => $config->hasQuery() ? $config->getQuery() : null,
+            'filter' => $config->hasFilter() ? $config->getFilter() : null,
             'mode' => $config->getMode(),
             'mapping' => $config->getMode() === ConfigDefinition::MODE_MAPPING ? $config->getMapping() : null,
             'isIncremental' => $config->isIncremental(),
