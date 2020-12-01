@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor\CsvWriter;
 
-use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use Keboola\AzureStorageTableExtractor\Exception\ApplicationException;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
-use Keboola\AzureStorageTableExtractor\IncrementalFetchingHelper;
-use Keboola\Component\JsonHelper;
+use Keboola\Component\Manifest\ManifestManager\Options\OutTableManifestOptions;
 use Keboola\CsvMap\Exception\CsvMapperException;
 use Keboola\CsvMap\Mapper;
 use Keboola\CsvTable\Table;
@@ -17,9 +15,8 @@ class MappingCsvWriter extends BaseCsvWriter implements ICsvWriter
 {
     private Mapper $mapper;
 
-    public function __construct(string $dataDir, Config $config, IncrementalFetchingHelper $incFetchingHelper)
+    protected function init(): void
     {
-        parent::__construct($dataDir, $config, $incFetchingHelper);
         try {
             $this->mapper = new Mapper($this->config->getMapping(), false, $this->config->getOutput());
         } catch (CsvMapperException $e) {
@@ -91,18 +88,19 @@ class MappingCsvWriter extends BaseCsvWriter implements ICsvWriter
                 return;
             }
 
-            $manifestPath = $csvPath . '.manifest';
-            file_put_contents($manifestPath, JsonHelper::encode($this->getManifest($csvTable), true));
+            $this->manifestManager->writeTableManifest(basename($csvPath), $this->getManifest($csvTable));
         }
     }
 
-    protected function getManifest(Table $csvTable): array
+    protected function getManifest(Table $csvTable): OutTableManifestOptions
     {
-        return [
-            'columns' => $csvTable->getHeader(),
-            'primary_key' => $csvTable->getPrimaryKey(true) ?? [],
-            'incremental' => $this->config->isIncremental(),
-        ];
+        /** @var string[] $primaryKey */
+        $primaryKey = $csvTable->getPrimaryKey(true) ?? [];
+        $options = new OutTableManifestOptions();
+        $options->setColumns($csvTable->getHeader());
+        $options->setPrimaryKeyColumns($primaryKey);
+        $options->setIncremental($this->config->isIncremental());
+        return $options;
     }
 
     protected function getCsvTargetPath(Table $csvTable): string
