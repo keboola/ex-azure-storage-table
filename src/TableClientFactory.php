@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor;
 
-use _HumbugBoxf99c1794c57d\Psr\Log\LogLevel;
 use GuzzleHttp\MessageFormatter;
 use GuzzleHttp\Middleware;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
@@ -16,6 +15,7 @@ use MicrosoftAzure\Storage\Table\Internal\Authentication\TableSharedKeyLiteAuthS
 use MicrosoftAzure\Storage\Table\Internal\MimeReaderWriter;
 use MicrosoftAzure\Storage\Table\Internal\TableResources as Resources;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use RuntimeException;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use MicrosoftAzure\Storage\Table\Internal\ITable;
