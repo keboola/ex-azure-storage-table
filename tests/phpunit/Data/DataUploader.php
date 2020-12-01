@@ -121,7 +121,11 @@ class DataUploader
                 [$type, $value] = $this->explodeTypeAndValue($cell);
                 // Convert datetime
                 if ($type === EdmType::DATETIME) {
-                    $value = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $value);
+                    $date = $value;
+                    $value = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $date);
+                    if (!$value) {
+                        throw new RuntimeException(sprintf('Invalid date: "%s".', $date));
+                    }
                 } elseif ($type === EdmType::BOOLEAN) {
                     $value = $value === '1';
                 }
@@ -148,6 +152,7 @@ class DataUploader
             $entity = new Entity();
             $entity->setPartitionKey('my-partition');
             $entity->setRowKey((string) $id);
+            $entity->addProperty('rowId', EdmType::STRING, sprintf('%020d', $id));
             $entity->addProperty('rand1', EdmType::STRING, (string) rand(1, 1000));
             $entity->addProperty('rand2', EdmType::INT32, rand(1, 1000));
             yield $entity;

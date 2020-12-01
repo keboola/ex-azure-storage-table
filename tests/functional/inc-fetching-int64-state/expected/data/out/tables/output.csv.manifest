@@ -1,0 +1,10 @@
+{
+    "primary_key": [
+        "id"
+    ],
+    "columns": [
+        "id",
+        "int64"
+    ],
+    "incremental": true
+}
