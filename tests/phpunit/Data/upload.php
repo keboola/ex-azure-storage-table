@@ -8,4 +8,4 @@ use Keboola\AzureStorageTableExtractor\Tests\Data\DataUploader;
 
 $dataUploader = new DataUploader();
 $dataUploader->uploadFromDir(__DIR__ . '/tables');
-$dataUploader->uploadBigTable();
+//$dataUploader->uploadBigTable();

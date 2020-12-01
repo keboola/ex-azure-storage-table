@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor;
 
+use _HumbugBoxf99c1794c57d\Psr\Log\LogLevel;
+use GuzzleHttp\MessageFormatter;
+use GuzzleHttp\Middleware;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
 use MicrosoftAzure\Storage\Common\Internal\Authentication\SharedAccessSignatureAuthScheme;
 use MicrosoftAzure\Storage\Common\Internal\Middlewares\CommonRequestMiddleware;
@@ -12,6 +15,7 @@ use MicrosoftAzure\Storage\Common\Internal\Utilities;
 use MicrosoftAzure\Storage\Table\Internal\Authentication\TableSharedKeyLiteAuthScheme;
 use MicrosoftAzure\Storage\Table\Internal\MimeReaderWriter;
 use MicrosoftAzure\Storage\Table\Internal\TableResources as Resources;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use MicrosoftAzure\Storage\Table\Internal\ITable;
@@ -21,15 +25,27 @@ class TableClientFactory
 {
     private Config $config;
 
-    public function __construct(Config $config)
+    private LoggerInterface $logger;
+
+    public function __construct(Config $config, LoggerInterface $logger)
     {
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     public function create(): ITable
     {
         try {
-            return $this->createTableService($this->config->getConnectionString());
+            $options = [
+                'middlewares' => [
+                    Middleware::log(
+                        $this->logger,
+                        new MessageFormatter('{method} - {uri} - {code}'),
+                        LogLevel::DEBUG
+                    ),
+                ],
+            ];
+            return $this->createTableService($this->config->getConnectionString(), $options);
         } catch (RuntimeException $e) {
             throw UserException::from($e, $this->config->getConnectionString(), 'Connection error: ');
         }

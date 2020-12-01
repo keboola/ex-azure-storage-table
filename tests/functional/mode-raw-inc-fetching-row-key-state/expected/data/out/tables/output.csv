@@ -1,0 +1,3 @@
+"Europe","3","{""PartitionKey"":""Europe"",""RowKey"":""3"",""name"":""Jacob"",""age"":25,""height"":""182"",""credits"":0.45,""has_pet"":false,""date"":""***"",""bin"":""YmluX2Jsb2Iy"",""Timestamp"":""***""}"
+"Europe","4","{""PartitionKey"":""Europe"",""RowKey"":""4"",""name"":""Michael"",""age"":27,""height"":""173"",""credits"":14.2,""has_pet"":true,""date"":""***"",""bin"":""YmluX2Jsb2I0"",""Timestamp"":""***""}"
+"Europe","5","{""PartitionKey"":""Europe"",""RowKey"":""5"",""name"":""Oliver"",""age"":37,""height"":""175"",""credits"":11.89,""has_pet"":false,""date"":""***"",""bin"":""YmluX2Jsb2I1"",""Timestamp"":""***""}"

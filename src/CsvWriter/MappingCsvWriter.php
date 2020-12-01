@@ -7,6 +7,7 @@ namespace Keboola\AzureStorageTableExtractor\CsvWriter;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use Keboola\AzureStorageTableExtractor\Exception\ApplicationException;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
+use Keboola\AzureStorageTableExtractor\IncrementalFetchingHelper;
 use Keboola\Component\JsonHelper;
 use Keboola\CsvMap\Exception\CsvMapperException;
 use Keboola\CsvMap\Mapper;
@@ -16,9 +17,9 @@ class MappingCsvWriter extends BaseCsvWriter implements ICsvWriter
 {
     private Mapper $mapper;
 
-    public function __construct(string $dataDir, Config $config)
+    public function __construct(string $dataDir, Config $config, IncrementalFetchingHelper $incFetchingHelper)
     {
-        parent::__construct($dataDir, $config);
+        parent::__construct($dataDir, $config, $incFetchingHelper);
         try {
             $this->mapper = new Mapper($this->config->getMapping(), false, $this->config->getOutput());
         } catch (CsvMapperException $e) {
@@ -28,6 +29,9 @@ class MappingCsvWriter extends BaseCsvWriter implements ICsvWriter
 
     public function writeItem(object $item): void
     {
+        parent::writeItem($item);
+        $this->unsetODataMetadata($item);
+
         // Ensure UNIQUE FK for sub-documents with the SAME CONTENT, but from the DIFFERENT parent document
         $userData = ['parentId' => md5(serialize($item))];
         try {
@@ -35,7 +39,6 @@ class MappingCsvWriter extends BaseCsvWriter implements ICsvWriter
         } catch (CsvMapperException $e) {
             throw new UserException($e->getMessage(), $e->getCode(), $e);
         }
-        $this->maxIncrementalValue = $item;
     }
 
     public function finalize(): void
