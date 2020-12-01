@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 
 class Extractor
 {
-    public const ACCEPT_HEADER = 'application/json;odata=nometadata';
+    public const ACCEPT_HEADER = 'application/json;odata=fullmetadata';
 
     public const PROGRESS_LOG_INTERVAL_SEC = 30;
 
@@ -29,7 +29,7 @@ class Extractor
 
     private CsvWriterFactory $csvWriterFactory;
 
-    private array $inputState;
+    private IncrementalFetchingHelper $incFetchingHelper;
 
     private int $pageCount = 0;
 
@@ -43,14 +43,14 @@ class Extractor
         ITable $tableClient,
         QueryFactory $queryFactory,
         CsvWriterFactory $csvWriterFactory,
-        array $inputState
+        IncrementalFetchingHelper $incFetchingHelper
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->tableClient = $tableClient;
         $this->queryFactory = $queryFactory;
         $this->csvWriterFactory = $csvWriterFactory;
-        $this->inputState = $inputState;
+        $this->incFetchingHelper = $incFetchingHelper;
     }
 
     public function testConnection(): void
@@ -116,9 +116,7 @@ class Extractor
         $csvWriter->finalize();
 
         // Write last state incremental fetching
-        if ($this->config->hasIncrementalFetchingKey()) {
-            $csvWriter->writeLastState($this->inputState);
-        }
+        $this->incFetchingHelper->writeState();
     }
 
     private function logProgress(): void

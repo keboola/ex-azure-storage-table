@@ -1,0 +1,6 @@
+"PartitionKey","RowKey","name","height"
+"Europe","1","Edm.String:John","Edm.Int32:150"
+"Europe","3","Edm.String:Jacob","Edm.Int64:182"
+"Europe","2","Edm.String:Elizabeth","Edm.String:169"
+"Europe","4","Edm.String:Michael",""
+"Europe","5","Edm.String:Oliver","Edm.Int64:175"

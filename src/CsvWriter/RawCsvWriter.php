@@ -7,6 +7,7 @@ namespace Keboola\AzureStorageTableExtractor\CsvWriter;
 use Keboola\AzureStorageTableExtractor\Configuration\Config;
 use Keboola\AzureStorageTableExtractor\Exception\ApplicationException;
 use Keboola\AzureStorageTableExtractor\Exception\UserException;
+use Keboola\AzureStorageTableExtractor\IncrementalFetchingHelper;
 use Keboola\Component\JsonHelper;
 use Keboola\Csv\CsvWriter;
 
@@ -22,9 +23,9 @@ class RawCsvWriter extends BaseCsvWriter implements ICsvWriter
 
     private CsvWriter $writer;
 
-    public function __construct(string $dataDir, Config $config)
+    public function __construct(string $dataDir, Config $config, IncrementalFetchingHelper $incFetchingHelper)
     {
-        parent::__construct($dataDir, $config);
+        parent::__construct($dataDir, $config, $incFetchingHelper);
         $this->csvPath = sprintf('%s/out/tables/%s.csv', $dataDir, $config->getOutput());
         $this->writer = new CsvWriter($this->csvPath);
     }
@@ -40,6 +41,7 @@ class RawCsvWriter extends BaseCsvWriter implements ICsvWriter
     public function writeItem(object $item): void
     {
         parent::writeItem($item);
+        $this->unsetODataMetadata($item);
 
         [$partitionKey, $rowKey] = $this->getPrimaryKey($item);
 

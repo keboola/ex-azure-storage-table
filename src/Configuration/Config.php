@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Keboola\AzureStorageTableExtractor\Configuration;
 
+use InvalidArgumentException;
 use Keboola\AzureStorageTableExtractor\Exception\UndefinedValueException;
 use Keboola\Component\Config\BaseConfig;
 
 class Config extends BaseConfig
 {
-    public const STATE_INCREMENTAL_VALUE = 'maxIncrementalValue';
-
     public function getConnectionString(): string
     {
         return $this->getValue(['parameters', 'db', '#connectionString']);
@@ -66,7 +65,11 @@ class Config extends BaseConfig
 
     public function hasIncrementalFetchingKey(): bool
     {
-        return $this->getValue(['parameters', 'incrementalFetchingKey']) !== null;
+        try {
+            return $this->getValue(['parameters', 'incrementalFetchingKey']) !== null;
+        } catch (InvalidArgumentException $e) {
+            return false;
+        }
     }
 
     public function getIncrementalFetchingKey(): string

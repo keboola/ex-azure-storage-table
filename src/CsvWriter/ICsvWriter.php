@@ -15,9 +15,4 @@ interface ICsvWriter
      * Called when all items are written
      */
     public function finalize(): void;
-
-    /**
-     * Write last state for incremental fetching
-     */
-    public function writeLastState(array $inputState): void;
 }

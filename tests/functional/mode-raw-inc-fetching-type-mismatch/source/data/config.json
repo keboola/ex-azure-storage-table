@@ -1,0 +1,12 @@
+{
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    },
+    "table": "types-mismatch",
+    "output": "output",
+    "mode": "raw",
+    "incremental": true,
+    "incrementalFetchingKey": "height"
+  }
+}

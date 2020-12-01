@@ -22,16 +22,19 @@ class Component extends BaseComponent
     {
         parent::__construct($logger);
         $config = $this->getConfig();
-        $clientFactory = new TableClientFactory($config);
-        $queryFactory = new QueryFactory($config);
-        $csvWriterFactory = new CsvWriterFactory($this->getDataDir(), $config);
+        $logger = $this->getLogger();
+        $dataDir = $this->getDataDir();
+        $incFetchingHelper = new IncrementalFetchingHelper($config, $dataDir, $this->getInputState());
+        $clientFactory = new TableClientFactory($config, $logger);
+        $queryFactory = new QueryFactory($config, $incFetchingHelper);
+        $csvWriterFactory = new CsvWriterFactory($dataDir, $config, $incFetchingHelper);
         $this->extractor = new Extractor(
             $config,
-            $this->getLogger(),
+            $logger,
             $clientFactory->create(),
             $queryFactory,
             $csvWriterFactory,
-            $this->getInputState()
+            $incFetchingHelper
         );
     }
 

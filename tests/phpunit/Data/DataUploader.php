@@ -46,13 +46,9 @@ class DataUploader
         $header = $csvReader->getHeader();
         $csvIterator->next(); // skip header
 
-        // First row after header is column type
-        $types = $csvIterator->current();
-        $csvIterator->next();
-
         $batch = new BatchOperations();
         foreach ($csvIterator as $row) {
-            $batch->addInsertOrReplaceEntity($tableName, $this->rowToEntity($row, $header, $types));
+            $batch->addInsertOrReplaceEntity($tableName, $this->rowToEntity($row, $header));
         }
         $this->client->batch($batch);
         echo "OK\n";
@@ -108,31 +104,35 @@ class DataUploader
         }
     }
 
-    private function rowToEntity(array &$row, array &$header, array &$types): Entity
+    private function rowToEntity(array &$row, array &$header): Entity
     {
         $entity = new Entity();
         foreach ($row as $index => $cell) {
-            $key = $header[$index];
-            $type = $types[$index];
-
             // Ignore empty cells
             if ($cell === '') {
                 continue;
             }
 
-            // Convert datetime
-            if ($type === EdmType::DATETIME) {
-                $cell = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $cell);
-            } elseif ($type === EdmType::BOOLEAN) {
-                $cell = $cell === '1';
+            $key = $header[$index];
+            if ($key === 'PartitionKey' || $key === 'RowKey') {
+                $value = $cell;
+                $type = null;
+            } else {
+                [$type, $value] = $this->explodeTypeAndValue($cell);
+                // Convert datetime
+                if ($type === EdmType::DATETIME) {
+                    $value = DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $value);
+                } elseif ($type === EdmType::BOOLEAN) {
+                    $value = $value === '1';
+                }
             }
 
             if ($key === 'PartitionKey') {
-                $entity->setPartitionKey((string) $cell);
+                $entity->setPartitionKey((string) $value);
             } elseif ($key === 'RowKey') {
-                $entity->setRowKey((string) $cell);
+                $entity->setRowKey((string) $value);
             } else {
-                $entity->addProperty($key, $type, $cell);
+                $entity->addProperty($key, $type, $value);
             }
         }
 
@@ -152,5 +152,10 @@ class DataUploader
             $entity->addProperty('rand2', EdmType::INT32, rand(1, 1000));
             yield $entity;
         }
+    }
+
+    private function explodeTypeAndValue(string $cell): array
+    {
+        return explode(':', $cell, 2);
     }
 }
