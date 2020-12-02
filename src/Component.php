@@ -25,9 +25,9 @@ class Component extends BaseComponent
         $logger = $this->getLogger();
         $dataDir = $this->getDataDir();
         $manifestManager = $this->getManifestManager();
-        $incFetchingHelper = new IncrementalFetchingHelper($config, $dataDir, $this->getInputState());
+        $incFetchingHelper = new IncrementalFetchingHelper($config, $logger, $dataDir, $this->getInputState());
         $clientFactory = new TableClientFactory($config, $logger);
-        $queryFactory = new QueryFactory($config, $incFetchingHelper);
+        $queryFactory = new QueryFactory($config, $logger, $incFetchingHelper);
         $csvWriterFactory = new CsvWriterFactory($dataDir, $manifestManager, $config, $incFetchingHelper);
         $this->extractor = new Extractor(
             $config,
