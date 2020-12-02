@@ -1,0 +1,4 @@
+Exporting table "inc-fetching" to "output" ...
+Incremental fetching: loading rows where "int64" >= "30" (Edm.Int64)
+Exported "3" rows / "1" pages.
+Incremental fetching: new state "int64" = "100" (Edm.Int64)

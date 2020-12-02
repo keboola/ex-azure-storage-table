@@ -1,0 +1,22 @@
+{
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    },
+    "table": "inc-fetching",
+    "output": "output",
+    "mode": "mapping",
+    "incremental": true,
+    "incrementalFetchingKey": "boolean",
+    "mapping": {
+      "RowKey": {
+        "type": "column",
+        "mapping": {
+          "destination": "id",
+          "primaryKey": true
+        }
+      },
+      "boolean": "boolean"
+    }
+  }
+}

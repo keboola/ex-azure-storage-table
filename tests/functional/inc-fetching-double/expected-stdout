@@ -1,0 +1,3 @@
+Exporting table "inc-fetching" to "output" ...
+Exported "5" rows / "1" pages.
+Incremental fetching: new state "double" = "50000.8" (Edm.Double)

@@ -1,0 +1,2 @@
+Warning: Key "RowKey" - type "Edm.String" is used for incremental fetching. For string type, all values must be the same length, otherwise incremental fetching fails.
+Unexpected value: Key "RowKey" - type "Edm.String" is used for incremental fetching. For string type, all values must be the same length. This condition is not met, found "1" (length=1) and "20" (length=2). Please use the same string lengths or a key with a different type: "Edm.Int32", "Edm.Int64", "Edm.DateTime", "Edm.Double", "Edm.Guid".

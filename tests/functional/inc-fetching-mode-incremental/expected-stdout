@@ -1,0 +1,3 @@
+Exporting table "simple" to "output" ...
+Exported "4" rows / "1" pages.
+Incremental fetching: new state "RowKey" = "4" (Edm.String)
