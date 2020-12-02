@@ -27,25 +27,28 @@ class TableClientFactory
 
     private LoggerInterface $logger;
 
-    public function __construct(Config $config, LoggerInterface $logger)
+    private RetryProxyFactory $retryProxyFactory;
+
+    public function __construct(Config $config, LoggerInterface $logger, RetryProxyFactory $retryProxyFactory)
     {
         $this->config = $config;
         $this->logger = $logger;
+        $this->retryProxyFactory = $retryProxyFactory;
     }
 
     public function create(): ITable
     {
+        $retry = $this->config->getAction() !== 'testConnection';
+
         try {
-            $options = [
-                'middlewares' => [
-                    Middleware::log(
-                        $this->logger,
-                        new MessageFormatter('{method} - {uri} - {code}'),
-                        LogLevel::DEBUG
-                    ),
-                ],
-            ];
-            return $this->createTableService($this->config->getConnectionString(), $options);
+            if ($retry) {
+                $retryProxy = $this->retryProxyFactory->create();
+                return $retryProxy->call(function () {
+                    return $this->createTableService($this->config->getConnectionString());
+                });
+            } else {
+                return $this->createTableService($this->config->getConnectionString());
+            }
         } catch (RuntimeException $e) {
             throw UserException::from($e, $this->config->getConnectionString(), 'Connection error: ');
         }
