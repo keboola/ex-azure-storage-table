@@ -1,0 +1,11 @@
+{
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    },
+    "table": "table",
+    "output": "output",
+    "mode": "raw",
+    "maxTries": 3
+  }
+}

@@ -9,6 +9,7 @@
         "keboola/csv": "^2.2",
         "keboola/csvmap": "^1.1",
         "keboola/php-component": "^8.1",
+        "keboola/retry": "^0.5.0",
         "microsoft/azure-storage-table": "^1.1"
     },
     "require-dev": {
