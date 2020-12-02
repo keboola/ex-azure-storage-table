@@ -24,7 +24,7 @@ class QueryFactory
     {
         $query = new Query();
 
-        // Apply incremental fetching filter
+        // Filter
         if ($this->incFetchingHelper->hasValue()) {
             $filter = Filter::applyGe(
                 Filter::applyPropertyName($this->incFetchingHelper->getKey()),
@@ -34,6 +34,18 @@ class QueryFactory
                 )
             );
             $query->setFilter($filter);
+        } elseif ($this->config->hasFilter()) {
+            $query->setFilter(Filter::applyQueryString($this->config->getFilter()));
+        }
+
+        // Select
+        if ($this->config->hasSelect()) {
+            $query->setSelectFields($this->config->getSelect());
+        }
+
+        // Limit
+        if ($this->config->hasLimit()) {
+            $query->setTop($this->config->getLimit());
         }
 
         return $query;

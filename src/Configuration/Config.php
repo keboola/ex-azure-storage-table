@@ -30,18 +30,18 @@ class Config extends BaseConfig
         return (int) $this->getValue(['parameters', 'maxTries']);
     }
 
-    public function hasQuery(): bool
+    public function hasFilter(): bool
     {
-        return $this->getValue(['parameters', 'query']) !== null;
+        return $this->getValue(['parameters', 'filter']) !== null;
     }
 
-    public function getQuery(): string
+    public function getFilter(): string
     {
-        if (!$this->hasQuery()) {
-            throw new UndefinedValueException('Query is not defined.');
+        if (!$this->hasFilter()) {
+            throw new UndefinedValueException('Filter is not defined.');
         }
 
-        return $this->getValue(['parameters', 'query']);
+        return $this->getValue(['parameters', 'filter']);
     }
 
     public function getMode(): string
@@ -86,13 +86,16 @@ class Config extends BaseConfig
         return $this->getValue(['parameters', 'select']) !== null;
     }
 
-    public function getSelect(): string
+    public function getSelect(): array
     {
         if (!$this->hasSelect()) {
             throw new UndefinedValueException('Select is not defined.');
         }
 
-        return $this->getValue(['parameters', 'select']);
+        return array_map(
+            fn(string $field) => trim($field),
+            explode(',', $this->getValue(['parameters', 'select']))
+        );
     }
 
     public function hasLimit(): bool

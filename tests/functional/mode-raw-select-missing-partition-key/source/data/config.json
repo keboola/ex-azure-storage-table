@@ -1,0 +1,11 @@
+{
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    },
+    "table": "simple",
+    "output": "output",
+    "mode": "raw",
+    "select": "RowKey, name, age"
+  }
+}
