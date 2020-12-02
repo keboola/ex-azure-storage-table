@@ -65,18 +65,19 @@ class Extractor
     public function extract(): void
     {
         $csvWriter = $this->csvWriterFactory->create();
-
-        $query = $this->queryFactory->create();
-        $options = new QueryEntitiesOptions();
-        $options->setQuery($query);
-        $options->setDecodeContent(false);
-        $options->setAccept(Extractor::ACCEPT_HEADER);
+        $limit = $this->config->hasLimit() ? $this->config->getLimit() : null;
 
         $this->logger->info(sprintf(
             'Exporting table "%s" to "%s" ...',
             $this->config->getTable(),
             $this->config->getOutput()
         ));
+
+        $query = $this->queryFactory->create();
+        $options = new QueryEntitiesOptions();
+        $options->setQuery($query);
+        $options->setDecodeContent(false);
+        $options->setAccept(Extractor::ACCEPT_HEADER);
 
         /** @var Promise|null $prevPagePromise */
         $prevPagePromise = null;
@@ -95,11 +96,18 @@ class Extractor
 
             // Process the previous page, while waiting for the next page ^^^^
             if ($result) {
+                $this->pageCount++;
                 foreach ($result->getEntities() as &$entity) {
                     $csvWriter->writeItem($entity);
                     $this->rowsCount++;
+
+                    // In the QueryFactory is "$top" set to the limit from the config
+                    // But "$top" is limit for one request/page, therefore we must check limit in the code
+                    if ($limit && $this->rowsCount >= $limit) {
+                        break 2;
+                    }
                 }
-                $this->pageCount++;
+
                 $this->logProgress();
             }
 
@@ -139,7 +147,7 @@ class Extractor
     private function logFinalStats(): void
     {
         $this->logger->info(sprintf(
-            'Exported all "%s" rows / "%s" pages.',
+            'Exported "%s" rows / "%s" pages.',
             $this->rowsCount,
             $this->pageCount
         ));
