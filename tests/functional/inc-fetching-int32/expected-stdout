@@ -1,0 +1,3 @@
+Exporting table "inc-fetching" to "output" ...
+Exported "5" rows / "1" pages.
+Incremental fetching: new state "int32" = "50000" (Edm.Int32)

@@ -1,0 +1,22 @@
+{
+  "parameters": {
+    "db": {
+      "#connectionString": "%env(string:CONNECTION_STRING)%"
+    },
+    "table": "simple",
+    "output": "output",
+    "mode": "mapping",
+    "mapping": {
+      "RowKey": {
+        "type": "column",
+        "mapping": {
+          "destination": "id",
+          "primaryKey": true
+        }
+      },
+      "invalid": "invalid"
+    },
+    "incremental": true,
+    "incrementalFetchingKey": "invalid"
+  }
+}

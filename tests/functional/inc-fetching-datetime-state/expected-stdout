@@ -1,0 +1,4 @@
+Exporting table "inc-fetching" to "output" ...
+Incremental fetching: loading rows where "datetime" >= "2016-09-15T23:14:25.0000000Z" (Edm.DateTime)
+Exported "3" rows / "1" pages.
+Incremental fetching: new state "datetime" = "2018-09-15T23:14:25.0000000Z" (Edm.DateTime)

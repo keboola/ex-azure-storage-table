@@ -1,0 +1,4 @@
+Exporting table "inc-fetching" to "output" ...
+Incremental fetching: loading rows where "guid" >= "9af071f2-d1eb-448a-936b-16cbe370763a" (Edm.Guid)
+Exported "2" rows / "1" pages.
+Incremental fetching: new state "guid" = "be0f9a11-5c7c-4de8-9f04-cbc4a879ac31" (Edm.Guid)
