@@ -184,7 +184,7 @@ class IncrementalFetchingHelper
                     'Unexpected value: Key "%s" - type "%s" is used for incremental fetching. ' .
                     'For string type, all values must be the same length. ' .
                     'This condition is not met, found "%s" (length=%d) and "%s" (length=%d). ' .
-                    'Please use the same string lengths or a key with a different type: "%s".',
+                    'Please use the same string lengths or use a key with a different type: "%s".',
                     $this->key,
                     $newType,
                     $this->maxValue,
