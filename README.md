@@ -1,7 +1,5 @@
 # Azure Storage Table Extractor
 
-[![Build Status](https://travis-ci.com/keboola/ex-azure-storage-table.svg?branch=master)](https://travis-ci.com/keboola/ex-azure-storage-table)
-
 Extracts data  from
 - [Azure Cosmos DB Table API](https://docs.microsoft.com/en-us/azure/cosmos-db/table-introduction)
 - [Azure Table storage](https://docs.microsoft.com/en-us/azure/cosmos-db/table-support)
