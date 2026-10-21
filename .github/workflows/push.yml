@@ -1,0 +1,80 @@
+name: GitHub Actions
+on: push
+
+concurrency: ci-${{ github.ref }}  # avoids tag collisions in the ECR
+
+env:
+  APP_IMAGE: keboola/ex-azure-storage-table
+  KBC_DEVELOPERPORTAL_VENDOR: keboola
+  KBC_DEVELOPERPORTAL_APP: keboola.ex-azure-storage-table
+  KBC_DEVELOPERPORTAL_USERNAME: ${{ vars.KBC_DEVELOPERPORTAL_USERNAME }}
+  KBC_DEVELOPERPORTAL_PASSWORD: ${{ secrets.KBC_DEVELOPERPORTAL_PASSWORD }}
+  DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+  KBC_STORAGE_TOKEN: ${{ secrets.KBC_STORAGE_TOKEN }}
+  KBC_APP_TEST_CONFIG_ID: ${{ vars.KBC_APP_TEST_CONFIG_ID }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Docker login
+        if: env.DOCKERHUB_TOKEN
+        run: docker login --username "$DOCKERHUB_USER" --password "$DOCKERHUB_TOKEN"
+
+      - name: Build image
+        run: docker build -t $APP_IMAGE .
+
+      - name: Run tests
+        run: docker run -e CONNECTION_STRING $APP_IMAGE composer ci
+
+      - name: Set image tag
+        id: tag
+        run: |
+          REF="${GITHUB_REF##*/}"
+          IS_SEMANTIC_TAG=false
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            TAG="$REF"
+            if echo "$REF" | grep -q '^v\?[0-9]\+\.[0-9]\+\.[0-9]\+$'; then
+              IS_SEMANTIC_TAG=true
+            fi
+          else
+            TAG="$REF-$GITHUB_RUN_NUMBER"
+          fi
+          echo "Tag = '$TAG', is semantic tag = '$IS_SEMANTIC_TAG'"
+          echo "app_image_tag=$TAG" >> $GITHUB_OUTPUT
+          echo "is_semantic_tag=$IS_SEMANTIC_TAG" >> $GITHUB_OUTPUT
+
+      - name: Push image to ECR
+        uses: keboola/action-push-to-ecr@master
+        with:
+          vendor: ${{ env.KBC_DEVELOPERPORTAL_VENDOR }}
+          app_id: ${{ env.KBC_DEVELOPERPORTAL_APP }}
+          username: ${{ env.KBC_DEVELOPERPORTAL_USERNAME }}
+          password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
+          tag: ${{ steps.tag.outputs.app_image_tag }}
+          push_latest: ${{ steps.tag.outputs.is_semantic_tag }}
+          source_image: ${{ env.APP_IMAGE }}
+
+      - name: Run KBC test job
+        if: env.KBC_APP_TEST_CONFIG_ID && env.KBC_STORAGE_TOKEN
+        uses: keboola/action-run-configs-parallel@master
+        with:
+          token: ${{ env.KBC_STORAGE_TOKEN }}
+          componentId: ${{ env.KBC_DEVELOPERPORTAL_APP }}
+          tag: ${{ steps.tag.outputs.app_image_tag }}
+          configs: ${{ env.KBC_APP_TEST_CONFIG_ID }}
+
+      - name: Set tag in the Developer Portal
+        if: steps.tag.outputs.is_semantic_tag == 'true'
+        uses: keboola/action-set-tag-developer-portal@master
+        with:
+          vendor: ${{ env.KBC_DEVELOPERPORTAL_VENDOR }}
+          app_id: ${{ env.KBC_DEVELOPERPORTAL_APP }}
+          username: ${{ env.KBC_DEVELOPERPORTAL_USERNAME }}
+          password: ${{ env.KBC_DEVELOPERPORTAL_PASSWORD }}
+          tag: ${{ steps.tag.outputs.app_image_tag }}
